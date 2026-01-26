@@ -1,107 +1,71 @@
-Guía de uso de RandomForestClassifier
-1. Introducción
+# Guía de uso de RandomForestClassifier
 
-RandomForestClassifier es un algoritmo de clasificación basado en árboles de decisión, que combina muchos árboles para mejorar la precisión y reducir el sobreajuste (overfitting).
+## Introducción
 
-Se basa en la técnica de bagging (Bootstrap Aggregating), donde cada árbol aprende de un subconjunto aleatorio de los datos y características, y la predicción final se realiza por votación mayoritaria entre todos los árboles.
+**RandomForestClassifier** es un algoritmo de clasificación basado en árboles de decisión que combina múltiples árboles para mejorar la precisión y reducir el sobreajuste (*overfitting*).
 
-2. Funcionamiento del algoritmo
+Se basa en la técnica de **bagging (Bootstrap Aggregating)**, donde cada árbol aprende a partir de un subconjunto aleatorio de los datos y de las características. La predicción final se obtiene mediante **votación mayoritaria** entre todos los árboles.
 
-Construcción del bosque
+---
 
-Se crean N árboles de decisión (n_estimators).
+## Funcionamiento del algoritmo
 
-Cada árbol se entrena con un subconjunto aleatorio de muestras del dataset (con reemplazo).
+### 1. Construcción del bosque
 
-Selección de características aleatorias
+- Se crean **N árboles de decisión** (`n_estimators`).
+- Cada árbol se entrena con un subconjunto aleatorio del dataset (**muestreo con reemplazo**).
 
-En cada nodo de cada árbol, se consideran solo un subconjunto de features (max_features) para dividir.
+### 2. Selección aleatoria de características
 
-Esto hace que los árboles sean diversos y no todos aprendan lo mismo.
+- En cada nodo, solo se considera un subconjunto de variables (`max_features`).
+- Esto aumenta la diversidad entre los árboles y reduce la correlación entre ellos.
 
-Predicción
+### 3. Predicción
 
-Para clasificación, cada árbol vota por una clase.
+- **Clasificación:** cada árbol vota por una clase y se devuelve la clase con más votos.
+- **Regresión:** se promedia la salida de todos los árboles.
 
-La clase con mayoría de votos se devuelve como predicción final.
+---
 
-Para regresión, se promedian los resultados de todos los árboles.
+## Hiperparámetros clave
 
+| Hiperparámetro       | Descripción                                      | Impacto |
+|----------------------|--------------------------------------------------|---------|
+| `n_estimators`       | Número de árboles en el bosque                   | Más árboles → mayor precisión, más tiempo |
+| `max_depth`          | Profundidad máxima de cada árbol                 | Controla el sobreajuste |
+| `min_samples_split`  | Mínimo de muestras para dividir un nodo          | Evita divisiones demasiado específicas |
+| `min_samples_leaf`   | Mínimo de muestras en una hoja                   | Reduce la memorización |
+| `max_features`       | Features usadas en cada división                 | Diversifica los árboles |
+| `bootstrap`          | Muestreo con reemplazo                           | `True` por defecto (bagging) |
 
-3. Hiperparámetros clave
-| Hiperparámetro      | Descripción                                    | Impacto                                                         |
-| ------------------- | ---------------------------------------------- | --------------------------------------------------------------- |
-| `n_estimators`      | Número de árboles en el bosque                 | Más árboles = mayor precisión, pero más tiempo de entrenamiento |
-| `max_depth`         | Profundidad máxima de cada árbol               | Controla el sobreajuste                                         |
-| `min_samples_split` | Mínimo número de muestras para dividir un nodo | Evita divisiones muy específicas                                |
-| `min_samples_leaf`  | Mínimo número de muestras en una hoja          | Evita que los árboles memoricen datos                           |
-| `max_features`      | Número de features a considerar en cada split  | Diversifica los árboles y reduce correlación entre ellos        |
-| `bootstrap`         | Si se toman muestras con reemplazo             | True por defecto (bagging)                                      |
+---
 
+## Consideraciones a tener en cuenta
 
+### Datos numéricos y categóricos
+- RandomForest admite ambos tipos, pero las variables categóricas deben codificarse (por ejemplo, `OneHotEncoder`).
 
-4. Consideraciones a tener en cuenta
+### Escalado
+- No requiere normalización de los datos, a diferencia de SVM o Logistic Regression.
 
-Datos numéricos y categóricos
+### Computación
+- Un mayor número de árboles incrementa el consumo de memoria y tiempo de entrenamiento.
 
-RandomForest funciona con ambos, pero las categorías deben estar codificadas (p.ej., OneHotEncoder).
+### Sobreajuste
+- Menos frecuente que en un árbol único, pero puede aparecer si `max_depth=None`.
 
-Escalado
+### Interpretabilidad
+- Menos interpretable que un solo árbol.
+- Se puede analizar la importancia de las variables con `feature_importances_`.
 
-No requiere normalización de features, a diferencia de SVM o LogisticRegression.
+### Aleatoriedad
+- Cada ejecución puede variar.
+- Usar `random_state` para garantizar reproducibilidad.
 
-Computación
+---
 
-Más árboles → más precisión → mayor consumo de memoria y tiempo.
+## Ejemplo básico de implementación
 
-Sobreajuste
-
-Menos frecuente que con un solo árbol, pero puede ocurrir si los árboles son demasiado profundos (max_depth=None).
-
-Interpretabilidad
-
-Es más difícil interpretar que un solo árbol; se puede usar feature_importances_ para entender la importancia de cada variable.
-
-Randomness
-
-Cada ejecución puede generar resultados ligeramente distintos; usar random_state para reproducibilidad.
-
-
-5. Ejemplo básico de implementación
+```python
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
-
-# Definir el modelo
-rf = RandomForestClassifier(random_state=42)
-
-# Definir hiperparámetros a probar
-param_grid = {
-    "n_estimators": [100, 200],
-    "max_depth": [None, 20, 40],
-    "min_samples_leaf": [1, 2],
-    "max_features": ["sqrt"]
-}
-
-# GridSearchCV para seleccionar los mejores hiperparámetros
-gs_rf = GridSearchCV(rf, param_grid, cv=5, scoring="accuracy")
-gs_rf.fit(X_train, y_train)
-
-# Mejor modelo
-best_rf = gs_rf.best_estimator_
-
-# Validación y métricas
-accuracy_test = best_rf.score(X_test, y_test)
-print("Accuracy en test:", accuracy_test)
-6. Recomendaciones para su uso
-
-Comenzar con un número moderado de árboles (100-200) y aumentar si hay tiempo.
-
-Probar distintos valores de max_depth y min_samples_leaf para evitar sobreajuste.
-
-Revisar importancia de variables con best_rf.feature_importances_.
-
-Usar RandomizedSearchCV si el grid es muy grande para ahorrar tiempo.
-
-Siempre usar random_state para reproducibilidad en entornos educativos o de investigación.
-
-![ilustracion](randomForest.png)
