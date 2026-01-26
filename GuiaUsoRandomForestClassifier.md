@@ -102,9 +102,6 @@ from sklearn.model_selection import GridSearchCV
   Número de particiones para la validación cruzada (*cross-validation*).  
   Por ejemplo, `cv=5` divide los datos en 5 folds.
 
-- **`scoring`**  
-  Métrica utilizada para evaluar el rendimiento del modelo (por ejemplo, `accuracy`, `f1`, `roc_auc`).
-
 - **`n_jobs`**  
   Número de núcleos del procesador utilizados.  
   `-1` indica que se usan todos los núcleos disponibles.
@@ -120,4 +117,5 @@ gs_rf = GridSearchCV(
 )
 
 gs_rf.fit(X_train, y_train)
+
 
