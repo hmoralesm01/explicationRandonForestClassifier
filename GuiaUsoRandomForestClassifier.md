@@ -43,10 +43,7 @@ Se basa en la técnica de **bagging (Bootstrap Aggregating)**, donde cada árbol
 ## Consideraciones a tener en cuenta
 
 ### Datos numéricos y categóricos
-- RandomForest admite ambos tipos, pero las variables categóricas deben codificarse (por ejemplo, `OneHotEncoder`).
-
-### Escalado
-- No requiere normalización de los datos, a diferencia de SVM o Logistic Regression.
+- RandomForest admite ambos tipos, pero las variables categóricas deben codificarse (por ejemplo, `OneHotEncoder`). Es decir, los datos que vamos a procesar deben de ser numericos, las clases que tenemos que adivinar pueden ser strings.
 
 ### Computación
 - Un mayor número de árboles incrementa el consumo de memoria y tiempo de entrenamiento.
@@ -64,8 +61,32 @@ Se basa en la técnica de **bagging (Bootstrap Aggregating)**, donde cada árbol
 
 ---
 
-## Ejemplo básico de implementación
+## Ejemplo de implementación
 
-```python
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import GridSearchCV
+# Grid de hyperparametros. Va a probar todas las combinaciones.
+    # n_estimators → cuántos árboles hay
+    # max_depth → qué tan profundos pueden crecer
+    # min_samples_leaf → evita árboles “demasiado específicos”
+    # max_features → cuántas variables ve cada árbol
+
+rf_param_grid = {
+    "n_estimators": [100, 200],
+    "max_depth": [None, 20, 40],
+    "min_samples_leaf": [1, 2],
+    "max_features": ["sqrt"]
+}
+
+# A traves de GridSearchCV, vamos a instaciar nuestro modelo. EL primer parametro es el tipo de modelo. El segundo la semilla. CV para la validacion cruzada, en este caso seria el 20%
+gs_rf = GridSearchCV(
+    RandomForestClassifier(
+        random_state=42,
+        n_jobs=-1
+    ),
+    param_grid=rf_param_grid,
+    cv=5,
+    verbose=True
+)
+# Entreno y comprobacion de puntuacion.
+gs_rf.fit(X_train, y_train)
+
+
