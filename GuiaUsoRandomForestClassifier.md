@@ -59,6 +59,8 @@ Se basa en la técnica de **bagging (Bootstrap Aggregating)**, donde cada árbol
 - Cada ejecución puede variar.
 - Usar `random_state` para garantizar reproducibilidad.
 
+<img width="592" height="444" alt="randomForest" src="https://github.com/user-attachments/assets/eecca76b-0bd9-48c7-98f1-cc83f7b10988" />
+
 ---
 
 ## Ejemplo de implementación
@@ -117,5 +119,6 @@ gs_rf = GridSearchCV(
 )
 
 gs_rf.fit(X_train, y_train)
+
 
 
