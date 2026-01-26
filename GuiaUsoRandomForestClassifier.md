@@ -63,11 +63,20 @@ Se basa en la técnica de **bagging (Bootstrap Aggregating)**, donde cada árbol
 
 ## Ejemplo de implementación
 
-# Grid de hyperparametros. Va a probar todas las combinaciones.
-    # n_estimators → cuántos árboles hay
-    # max_depth → qué tan profundos pueden crecer
-    # min_samples_leaf → evita árboles “demasiado específicos”
-    # max_features → cuántas variables ve cada árbol
+---
+
+## Ejemplo de ajuste de hiperparámetros con GridSearchCV
+
+Ejemplo práctico de cómo ajustar los hiperparámetros de un modelo **RandomForestClassifier** utilizando **GridSearchCV**, probando todas las combinaciones posibles del grid definido.
+
+### Grid de hiperparámetros
+
+```python
+# Grid de hiperparámetros
+# n_estimators → número de árboles del bosque
+# max_depth → profundidad máxima de cada árbol
+# min_samples_leaf → mínimo de muestras por hoja
+# max_features → número de variables consideradas en cada división
 
 rf_param_grid = {
     "n_estimators": [100, 200],
@@ -76,17 +85,39 @@ rf_param_grid = {
     "max_features": ["sqrt"]
 }
 
-# A traves de GridSearchCV, vamos a instaciar nuestro modelo. EL primer parametro es el tipo de modelo. El segundo la semilla. CV para la validacion cruzada, en este caso seria el 20%
+
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import GridSearchCV
+
+### Parámetros principales de GridSearchCV
+
+- **`estimator`**  
+  Modelo de aprendizaje automático que se desea optimizar (por ejemplo, `RandomForestClassifier`).
+
+- **`param_grid`**  
+  Diccionario que define los hiperparámetros y los valores que se probarán.  
+  GridSearchCV evalúa **todas las combinaciones posibles**.
+
+- **`cv`**  
+  Número de particiones para la validación cruzada (*cross-validation*).  
+  Por ejemplo, `cv=5` divide los datos en 5 folds.
+
+- **`scoring`**  
+  Métrica utilizada para evaluar el rendimiento del modelo (por ejemplo, `accuracy`, `f1`, `roc_auc`).
+
+- **`n_jobs`**  
+  Número de núcleos del procesador utilizados.  
+  `-1` indica que se usan todos los núcleos disponibles.
+
 gs_rf = GridSearchCV(
     RandomForestClassifier(
-        random_state=42,
+        random_state=42
         n_jobs=-1
     ),
     param_grid=rf_param_grid,
     cv=5,
     verbose=True
 )
-# Entreno y comprobacion de puntuacion.
-gs_rf.fit(X_train, y_train)
 
+gs_rf.fit(X_train, y_train)
 
